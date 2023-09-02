@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jade.finance.mapper.UserFundMapper">
+
+    <resultMap type="com.jade.finance.entity.UserFund" id="UserFundMap">
+        <result property="fundId" column="fund_id" jdbcType="INTEGER"/>
+        <result property="fundCode" column="fund_code" jdbcType="VARCHAR"/>
+        <result property="fundName" column="fund_name" jdbcType="VARCHAR"/>
+        <result property="fundType" column="fund_type" jdbcType="VARCHAR"/>
+        <result property="netWorth" column="net_worth" jdbcType="VARCHAR"/>
+        <result property="buySourceRate" column="buy_source_rate" jdbcType="VARCHAR"/>
+        <result property="buyRate" column="buy_rate" jdbcType="VARCHAR"/>
+        <result property="manager" column="manager" jdbcType="VARCHAR"/>
+        <result property="millionCopiesIncome" column="million_copies_income" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="UserFundMap">
+        select
+          fund_id, fund_code, fund_name, fund_type, net_worth, buy_source_rate, buy_rate, manager, million_copies_income
+        from jade.user_fund
+        where fund_id = #{fundId}
+    </select>
+
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="UserFundMap">
+        select
+          fund_id, fund_code, fund_name, fund_type, net_worth, buy_source_rate, buy_rate, manager, million_copies_income
+        from jade.user_fund
+        <where>
+            <if test="fundId != null">
+                and fund_id = #{fundId}
+            </if>
+            <if test="fundCode != null and fundCode != ''">
+                and fund_code = #{fundCode}
+            </if>
+            <if test="fundName != null and fundName != ''">
+                and fund_name = #{fundName}
+            </if>
+            <if test="fundType != null and fundType != ''">
+                and fund_type = #{fundType}
+            </if>
+            <if test="netWorth != null and netWorth != ''">
+                and net_worth = #{netWorth}
+            </if>
+            <if test="buySourceRate != null and buySourceRate != ''">
+                and buy_source_rate = #{buySourceRate}
+            </if>
+            <if test="buyRate != null and buyRate != ''">
+                and buy_rate = #{buyRate}
+            </if>
+            <if test="manager != null and manager != ''">
+                and manager = #{manager}
+            </if>
+            <if test="millionCopiesIncome != null and millionCopiesIncome != ''">
+                and million_copies_income = #{millionCopiesIncome}
+            </if>
+        </where>
+    </select>
+    <select id="findType" resultType="java.lang.String">
+        select fund_type from jade.user_fund group by fund_type
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="fundId" useGeneratedKeys="true">
+        insert into jade.user_fund(fund_code, fund_name, fund_type, net_worth, buy_source_rate, buy_rate, manager, million_copies_income)
+        values (#{fundCode}, #{fundName}, #{fundType}, #{netWorth}, #{buySourceRate}, #{buyRate}, #{manager}, #{millionCopiesIncome})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update jade.user_fund
+        <set>
+            <if test="fundCode != null and fundCode != ''">
+                fund_code = #{fundCode},
+            </if>
+            <if test="fundName != null and fundName != ''">
+                fund_name = #{fundName},
+            </if>
+            <if test="fundType != null and fundType != ''">
+                fund_type = #{fundType},
+            </if>
+            <if test="netWorth != null and netWorth != ''">
+                net_worth = #{netWorth},
+            </if>
+            <if test="buySourceRate != null and buySourceRate != ''">
+                buy_source_rate = #{buySourceRate},
+            </if>
+            <if test="buyRate != null and buyRate != ''">
+                buy_rate = #{buyRate},
+            </if>
+            <if test="manager != null and manager != ''">
+                manager = #{manager},
+            </if>
+            <if test="millionCopiesIncome != null and millionCopiesIncome != ''">
+                million_copies_income = #{millionCopiesIncome},
+            </if>
+        </set>
+        where fund_id = #{fundId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from jade.user_fund where fund_id = #{fundId}
+    </delete>
+
+</mapper>

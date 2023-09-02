@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jade.equity.mapper.ClaimsAndDebtMapper">
+
+    <resultMap type="com.jade.equity.entity.ClaimsAndDebt" id="ClaimsAndDebtMap">
+        <result property="cadId" column="CAD_id" jdbcType="INTEGER"/>
+        <result property="cadType" column="CAD_type" jdbcType="VARCHAR"/>
+        <result property="creditor" column="creditor" jdbcType="VARCHAR"/>
+        <result property="obligor" column="obligor" jdbcType="VARCHAR"/>
+        <result property="cadNum" column="CAD_num" jdbcType="VARCHAR"/>
+        <result property="cadTime" column="CAD_time" jdbcType="VARCHAR"/>
+        <result property="cadRepay" column="CAD_repay" jdbcType="VARCHAR"/>
+        <result property="cadPlan" column="CAD_plan" jdbcType="VARCHAR"/>
+        <result property="cadRemark" column="CAD_remark" jdbcType="VARCHAR"/>
+        <result property="cadStatus" column="CAD_status" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="ClaimsAndDebtMap">
+        select
+          CAD_id, CAD_type, creditor, obligor, CAD_num, CAD_time, CAD_repay, CAD_plan, CAD_remark, CAD_status
+        from jade.claims_and_debt
+        where CAD_id = #{cadId}
+    </select>
+
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="ClaimsAndDebtMap">
+        select
+          CAD_id, CAD_type, creditor, obligor, CAD_num, CAD_time, CAD_repay, CAD_plan, CAD_remark, CAD_status
+        from jade.claims_and_debt
+        <where>
+            <if test="cadId != null">
+                and CAD_id = #{cadId}
+            </if>
+            <if test="cadType != null and cadType != ''">
+                and CAD_type = #{cadType}
+            </if>
+            <if test="creditor != null and creditor != ''">
+                and creditor = #{creditor}
+            </if>
+            <if test="obligor != null and obligor != ''">
+                and obligor = #{obligor}
+            </if>
+            <if test="cadNum != null and cadNum != ''">
+                and CAD_num = #{cadNum}
+            </if>
+            <if test="cadTime != null and cadTime != ''">
+                and CAD_time between #{date1} and #{date2}
+            </if>
+            <if test="cadRepay != null and cadRepay != ''">
+                and CAD_repay = #{cadRepay}
+            </if>
+            <if test="cadPlan != null and cadPlan != ''">
+                and CAD_plan = #{cadPlan}
+            </if>
+            <if test="cadRemark != null and cadRemark != ''">
+                and CAD_remark = #{cadRemark}
+            </if>
+            <if test="cadStatus != null and cadStatus != ''">
+                and CAD_status = #{cadStatus}
+            </if>
+        </where>
+        order by CAD_id desc ,CAD_num desc
+    </select>
+    <select id="claimsGroup" resultType="java.util.Map">
+        select SUM(CAD_num) as value,obligor as name
+        from claims_and_debt
+        where CAD_type = '借出'
+        group by obligor
+    </select>
+    <select id="debtGroup" resultType="java.util.Map">
+        select SUM(CAD_num) as value ,creditor as name
+        from claims_and_debt
+        where CAD_type = '借入'
+        group by creditor
+    </select>
+    <select id="sumClaim" resultType="java.lang.Object">
+        select SUM(CAD_num) as sumClaim from claims_and_debt where CAD_type='借出'
+    </select>
+    <select id="sumDebt" resultType="java.lang.Object">
+        select SUM(CAD_num) as sumDebt from claims_and_debt where CAD_type='借入'
+    </select>
+    <select id="maxClaim" resultType="java.lang.Object">
+        select MAX(CAD_num) as  maxClaim from claims_and_debt where CAD_type='借出'
+    </select>
+    <select id="maxDebt" resultType="java.lang.Object">
+        select MAX(CAD_num) as maxDebt from claims_and_debt where CAD_type='借入'
+    </select>
+
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update jade.claims_and_debt
+        <set>
+            <if test="cadType != null and cadType != ''">
+                CAD_type = #{cadType},
+            </if>
+            <if test="creditor != null and creditor != ''">
+                creditor = #{creditor},
+            </if>
+            <if test="obligor != null and obligor != ''">
+                obligor = #{obligor},
+            </if>
+            <if test="cadNum != null and cadNum != ''">
+                CAD_num = #{cadNum},
+            </if>
+            <if test="cadTime != null and cadTime != ''">
+                CAD_time = #{cadTime},
+            </if>
+            <if test="cadRepay != null and cadRepay != ''">
+                CAD_repay = #{cadRepay},
+            </if>
+            <if test="cadPlan != null and cadPlan != ''">
+                CAD_plan = #{cadPlan},
+            </if>
+            <if test="cadRemark != null and cadRemark != ''">
+                CAD_remark = #{cadRemark},
+            </if>
+            <if test="cadStatus != null and cadStatus != ''">
+                CAD_status = #{cadStatus},
+            </if>
+        </set>
+        where CAD_id = #{cadId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from jade.claims_and_debt where CAD_id = #{cadId}
+    </delete>
+
+</mapper>

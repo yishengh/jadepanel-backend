@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jade.equity.mapper.UserAssetsMapper">
+
+    <resultMap type="com.jade.equity.entity.UserAssets" id="UserAssetsMap">
+        <result property="assetsId" column="assets_id" jdbcType="INTEGER"/>
+        <result property="assetsName" column="assets_name" jdbcType="VARCHAR"/>
+        <result property="assetsLocation" column="assets_location" jdbcType="VARCHAR"/>
+        <result property="assetsCreateTime" column="assets_create_time" jdbcType="VARCHAR"/>
+        <result property="totalPrice" column="total_price" jdbcType="VARCHAR"/>
+        <result property="historicalValue" column="historical_value" jdbcType="VARCHAR"/>
+        <result property="assetsOwner" column="assets_owner" jdbcType="VARCHAR"/>
+        <result property="assetsInstalment" column="assets_instalment" jdbcType="VARCHAR"/>
+        <result property="instalmentPrice" column="instalment_price" jdbcType="VARCHAR"/>
+        <result property="instalmentSurplus" column="instalment_surplus" jdbcType="VARCHAR"/>
+        <result property="realizationValue" column="realization_value" jdbcType="VARCHAR"/>
+        <result property="assetsRemark" column="assets_remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="UserAssetsMap">
+        select
+          assets_id, assets_name, assets_location, assets_create_time, total_price, historical_value, assets_owner, assets_instalment, instalment_price, instalment_surplus, realization_value, assets_remark
+        from jade.user_assets
+        where assets_id = #{assetsId}
+    </select>
+
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="UserAssetsMap">
+        select
+          assets_id, assets_name, assets_location, assets_create_time, total_price, historical_value, assets_owner, assets_instalment, instalment_price, instalment_surplus, realization_value, assets_remark
+        from jade.user_assets
+        <where>
+            <if test="assetsId != null">
+                and assets_id = #{assetsId}
+            </if>
+            <if test="assetsName != null and assetsName != ''">
+                and assets_name = #{assetsName}
+            </if>
+            <if test="assetsLocation != null and assetsLocation != ''">
+                and assets_location = #{assetsLocation}
+            </if>
+            <if test="assetsCreateTime != null and assetsCreateTime != ''">
+                and assets_create_time = #{assetsCreateTime}
+            </if>
+            <if test="totalPrice != null and totalPrice != ''">
+                and total_price = #{totalPrice}
+            </if>
+            <if test="historicalValue != null and historicalValue != ''">
+                and historical_value = #{historicalValue}
+            </if>
+            <if test="assetsOwner != null and assetsOwner != ''">
+                and assets_owner = #{assetsOwner}
+            </if>
+            <if test="assetsInstalment != null and assetsInstalment != ''">
+                and assets_instalment = #{assetsInstalment}
+            </if>
+            <if test="instalmentPrice != null and instalmentPrice != ''">
+                and instalment_price = #{instalmentPrice}
+            </if>
+            <if test="instalmentSurplus != null and instalmentSurplus != ''">
+                and instalment_surplus = #{instalmentSurplus}
+            </if>
+            <if test="realizationValue != null and realizationValue != ''">
+                and realization_value = #{realizationValue}
+            </if>
+            <if test="assetsRemark != null and assetsRemark != ''">
+                and assets_remark = #{assetsRemark}
+            </if>
+        </where>
+        order by assets_id desc
+    </select>
+
+
+    <select id="assetRatio" resultType="java.util.Map">
+        select assets_name as name, historical_value as value from user_assets
+    </select>
+    <select id="loanSituation" resultType="java.util.Map">
+        select assets_name as name, (instalment_surplus*instalment_price) as value from user_assets
+    </select>
+    <select id="totalCost" resultType="java.lang.Object">
+        select SUM(total_price)+SUM(assets_instalment)*SUM(instalment_price) as totalCost from user_assets
+    </select>
+    <select id="totalRealizableValue" resultType="java.lang.Object">
+        select SUM(realization_value) as totalRealizableValue from user_assets
+    </select>
+    <select id="totalMortgage" resultType="java.lang.Object">
+        select SUM(instalment_price)*SUM(instalment_surplus) as totalMortgage from user_assets
+    </select>
+    <select id="monthCost" resultType="java.lang.Object">
+        select SUM(instalment_price) as monthCost from user_assets
+    </select>
+
+
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="assetsId" useGeneratedKeys="true">
+        insert into jade.user_assets(assets_name, assets_location, assets_create_time, total_price, historical_value, assets_owner, assets_instalment, instalment_price, instalment_surplus, realization_value, assets_remark)
+        values (#{assetsName}, #{assetsLocation}, #{assetsCreateTime}, #{totalPrice}, #{historicalValue}, #{assetsOwner}, #{assetsInstalment}, #{instalmentPrice}, #{instalmentSurplus}, #{realizationValue}, #{assetsRemark})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update jade.user_assets
+        <set>
+            <if test="assetsName != null and assetsName != ''">
+                assets_name = #{assetsName},
+            </if>
+            <if test="assetsLocation != null and assetsLocation != ''">
+                assets_location = #{assetsLocation},
+            </if>
+            <if test="assetsCreateTime != null and assetsCreateTime != ''">
+                assets_create_time = #{assetsCreateTime},
+            </if>
+            <if test="totalPrice != null and totalPrice != ''">
+                total_price = #{totalPrice},
+            </if>
+            <if test="historicalValue != null and historicalValue != ''">
+                historical_value = #{historicalValue},
+            </if>
+            <if test="assetsOwner != null and assetsOwner != ''">
+                assets_owner = #{assetsOwner},
+            </if>
+            <if test="assetsInstalment != null and assetsInstalment != ''">
+                assets_instalment = #{assetsInstalment},
+            </if>
+            <if test="instalmentPrice != null and instalmentPrice != ''">
+                instalment_price = #{instalmentPrice},
+            </if>
+            <if test="instalmentSurplus != null and instalmentSurplus != ''">
+                instalment_surplus = #{instalmentSurplus},
+            </if>
+            <if test="realizationValue != null and realizationValue != ''">
+                realization_value = #{realizationValue},
+            </if>
+            <if test="assetsRemark != null and assetsRemark != ''">
+                assets_remark = #{assetsRemark},
+            </if>
+        </set>
+        where assets_id = #{assetsId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from jade.user_assets where assets_id = #{assetsId}
+    </delete>
+
+</mapper>
