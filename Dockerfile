@@ -18,6 +18,12 @@ RUN mkdir public
 
 # Expose port 10010
 EXPOSE 10010
+EXPOSE 8082
+EXPOSE 8081
+EXPOSE 8083
+EXPOSE 8085
+EXPOSE 8086
+EXPOSE 10086
 
 # 定义启动命令，运行所有的JAR文件
 CMD ["java", "-jar", "jade-bills.jar"]
