@@ -26,4 +26,10 @@ EXPOSE 8086
 EXPOSE 10086
 
 # Define the startup command to run all JAR files
-CMD ["java", "-jar", "jade-bills-0.0.1-SNAPSHOT.jar", "jade-equity-0.0.1-SNAPSHOT.jar", "jade-finance-0.0.1-SNAPSHOT.jar", "jade-gateway-0.0.1-SNAPSHOT.jar", "jade-registry-0.0.1-SNAPSHOT.jar", "jade-report-0.0.1-SNAPSHOT.jar", "jade-user-service-0.0.1-SNAPSHOT.jar"]
+CMD java -jar jade-bills-0.0.1-SNAPSHOT.jar & \
+    java -jar jade-equity-0.0.1-SNAPSHOT.jar & \
+    java -jar jade-finance-0.0.1-SNAPSHOT.jar & \
+    java -jar jade-gateway-0.0.1-SNAPSHOT.jar & \
+    java -jar jade-registry-0.0.1-SNAPSHOT.jar & \
+    java -jar jade-report-0.0.1-SNAPSHOT.jar & \
+    java -jar jade-user-service-0.0.1-SNAPSHOT.jar
