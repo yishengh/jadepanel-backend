@@ -5,7 +5,7 @@ FROM openjdk:20
 WORKDIR /app
 
 # Copy your JAR files to the container
-COPY ./jade-registry/target/jade-registry-0.0.1-SNAPSHOT.jar ./app/
+COPY ./jade-registry/target/jade-registry-0.0.1-SNAPSHOT.jar ./app/jade-registry-0.0.1-SNAPSHOT.jar
 
 # Create a "public" folder
 RUN mkdir /app/public
