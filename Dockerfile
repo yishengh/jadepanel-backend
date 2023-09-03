@@ -17,19 +17,7 @@ COPY ./jade-user/jade-user-service/target/jade-user-service-0.0.1-SNAPSHOT.jar .
 RUN mkdir public
 
 # Expose ports
-EXPOSE 10010
-EXPOSE 8082
-EXPOSE 8081
-EXPOSE 8083
-EXPOSE 8085
-EXPOSE 8086
 EXPOSE 10086
 
-# Define the startup command to run all JAR files
-CMD java -jar jade-bills-0.0.1-SNAPSHOT.jar & \
-    java -jar jade-equity-0.0.1-SNAPSHOT.jar & \
-    java -jar jade-finance-0.0.1-SNAPSHOT.jar & \
-    java -jar jade-gateway-0.0.1-SNAPSHOT.jar & \
-    java -jar jade-registry-0.0.1-SNAPSHOT.jar & \
-    java -jar jade-report-0.0.1-SNAPSHOT.jar & \
-    java -jar jade-user-service-0.0.1-SNAPSHOT.jar
+# Define the startup command to run only the registry JAR file
+CMD java -jar jade-registry-0.0.1-SNAPSHOT.jar
