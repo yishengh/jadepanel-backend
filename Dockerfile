@@ -10,9 +10,8 @@ COPY ./jade-registry/target/jade-registry-0.0.1-SNAPSHOT.jar ./app/jade-registry
 # Create a "public" folder
 RUN mkdir /app/public
 RUN java -version
-RUN chmod 777 *.jar
 # Expose ports
 EXPOSE 10086
 
 # Define the startup command to run only the registry JAR file and list files
-CMD java -jar /app/jade-registry-0.0.1-SNAPSHOT.jar
+ENTRYPOINT ["java", "-jar", "jade-registry-0.0.1-SNAPSHOT.jar"]
