@@ -27,6 +27,37 @@ jobs:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       run: |
-          docker build -t hyisheng/jadepanel-back:${{ github.sha }} .
+          cd jade-bills
+          docker build -t hyisheng/jadepanel-back-bills:${{ github.sha }} .
           echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-          docker push hyisheng/jadepanel-back:${{ github.sha }}
+          docker push hyisheng/jadepanel-back-bills:${{ github.sha }}
+          cd ..
+          cd jade-equity
+          docker build -t hyisheng/jadepanel-back-bills:${{ github.sha }} .
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+          docker push hyisheng/jadepanel-back-equity:${{ github.sha }}
+          cd ..
+          cd jade-finance
+          docker build -t hyisheng/jadepanel-back-finance:${{ github.sha }} .
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+          docker push hyisheng/jadepanel-back-finance:${{ github.sha }}
+          cd ..
+          cd jade-gateway
+          docker build -t hyisheng/jadepanel-back-gateway:${{ github.sha }} .
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+          docker push hyisheng/jadepanel-back-gateway:${{ github.sha }}
+          cd ..
+          cd jade-registry
+          docker build -t hyisheng/jadepanel-back-registry:${{ github.sha }} .
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+          docker push hyisheng/jadepanel-back-registry:${{ github.sha }}
+          cd ..
+          cd jade-report
+          docker build -t hyisheng/jadepanel-back-report:${{ github.sha }} .
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+          docker push hyisheng/jadepanel-back-report:${{ github.sha }}
+          cd ..
+          cd jade-user
+          docker build -t hyisheng/jadepanel-back-user:${{ github.sha }} .
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+          docker push hyisheng/jadepanel-back-user:${{ github.sha }}
