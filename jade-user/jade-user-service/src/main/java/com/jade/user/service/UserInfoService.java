@@ -55,5 +55,5 @@ public interface UserInfoService {
      */
     boolean deleteById(Integer userId);
 
-    UserInfo queryUser(String username, String password);
+    UserInfo queryUser(UserInfo userInfo);
 }

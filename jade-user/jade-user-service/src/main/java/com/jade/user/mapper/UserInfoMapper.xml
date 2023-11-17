@@ -5,7 +5,7 @@
     <resultMap type="com.jade.user.entity.UserInfo" id="UserInfoMap">
         <result property="userId" column="user_id" jdbcType="INTEGER"/>
         <result property="userName" column="user_name" jdbcType="VARCHAR"/>
-        <result property="userPassword" column="user_password" jdbcType="VARCHAR"/>
+        <result property="password" column="user_password" jdbcType="VARCHAR"/>
         <result property="sex" column="sex" jdbcType="VARCHAR"/>
         <result property="birthday" column="birthday" jdbcType="VARCHAR"/>
         <result property="email" column="email" jdbcType="VARCHAR"/>
@@ -13,12 +13,13 @@
         <result property="role" column="role" jdbcType="VARCHAR"/>
         <result property="isactive" column="isActive" jdbcType="INTEGER"/>
         <result property="createdate" column="createDate" jdbcType="VARCHAR"/>
+        <result property="money" column="money" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
     <select id="queryById" resultMap="UserInfoMap">
         select
-          user_id, user_name, user_password, sex, birthday, email, qq, role, isActive, createDate
+          user_id, user_name, user_password, sex, birthday, email, qq, role, isActive, createDate, money
         from jade.user_info
         where user_id = #{userId}
     </select>
@@ -26,7 +27,7 @@
     <!--查询指定行数据-->
     <select id="queryAllByLimit" resultMap="UserInfoMap">
         select
-          user_id, user_name, user_password, sex, birthday, email, qq, role, isActive, createDate
+          user_id, user_name, user_password, sex, birthday, email, qq, role, isActive, createDate, money
         from jade.user_info
         limit #{offset}, #{limit}
     </select>
@@ -34,7 +35,7 @@
     <!--通过实体作为筛选条件查询-->
     <select id="queryAll" resultMap="UserInfoMap">
         select
-          user_id, user_name, user_password, sex, birthday, email, qq, role, isActive, createDate
+          user_id, user_name, user_password, sex, birthday, email, qq, role, isActive, createDate, money
         from jade.user_info
         <where>
             <if test="userId != null">
@@ -43,8 +44,8 @@
             <if test="userName != null and userName != ''">
                 and user_name = #{userName}
             </if>
-            <if test="userPassword != null and userPassword != ''">
-                and user_password = #{userPassword}
+            <if test="password != null and password != ''">
+                and user_password = #{password}
             </if>
             <if test="sex != null and sex != ''">
                 and sex = #{sex}
@@ -69,8 +70,9 @@
             </if>
         </where>
     </select>
-    <select id="selectOne" resultType="com.jade.user.entity.UserInfo">
-        select user_id,user_password from jade.user_info where user_id = #{userId}
+
+    <select id="selectOne" resultMap="UserInfoMap">
+        select user_id, user_name, user_password, sex, birthday, email, qq, role, isActive, createDate, money from jade.user_info where user_name = #{userName} AND user_password = #{password}
     </select>
 
 
@@ -80,8 +82,8 @@
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="userId" useGeneratedKeys="true">
-        insert into jade.user_info(user_name, user_password, sex, birthday, email, qq, createDate)
-        values (#{userName}, #{userPassword}, #{sex}, #{birthday}, #{email}, #{qq}, #{createdate})
+        insert into jade.user_info(user_name, user_password, sex, birthday, email, qq, createDate, money)
+        values (#{userName}, #{password}, #{sex}, #{birthday}, #{email}, #{qq}, #{createdate})
     </insert>
 
     <!--通过主键修改数据-->
@@ -91,8 +93,8 @@
             <if test="userName != null and userName != ''">
                 user_name = #{userName},
             </if>
-            <if test="userPassword != null and userPassword != ''">
-                user_password = #{userPassword},
+            <if test="password != null and password != ''">
+                user_password = #{password},
             </if>
             <if test="sex != null and sex != ''">
                 sex = #{sex},
@@ -108,6 +110,9 @@
             </if>
             <if test="createdate != null and createdate != ''">
                 createDate = #{createdate},
+            </if>
+            <if test="money != null and money != ''">
+                money = #{money},
             </if>
         </set>
         where user_id = #{userId}

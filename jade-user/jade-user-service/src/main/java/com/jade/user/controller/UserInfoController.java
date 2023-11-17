@@ -4,10 +4,7 @@ import com.jade.user.entity.UserInfo;
 import com.jade.user.service.UserInfoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -47,8 +44,13 @@ public class UserInfoController {
             @RequestParam("username") String username,
             @RequestParam("password") String password
     ) {
-        UserInfo user = this.userInfoService.queryUser(username, password);
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserName(username);
+        userInfo.setPassword(password);
+        System.out.println("login");
+        UserInfo user = userInfoService.queryUser(userInfo);
         if (user == null) {
+            System.out.println("null");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         return ResponseEntity.ok(user);
@@ -60,5 +62,23 @@ public class UserInfoController {
         userInfo.setUserName(userName);
         UserInfo one = userInfoService.findOne(userInfo);
         return ResponseEntity.ok(one);
+    }
+
+
+    /**
+     * 修改数据
+     *
+     * @param money money
+     * @return Void
+     */
+    @GetMapping("updateMoney")
+    public ResponseEntity<Void> update( String money){
+        UserInfo userInfo = this.userInfoService.queryById(1);
+        if (money != null) {
+            System.out.println(money);
+            userInfo.setMoney(money);
+        }
+        userInfoService.update(userInfo);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

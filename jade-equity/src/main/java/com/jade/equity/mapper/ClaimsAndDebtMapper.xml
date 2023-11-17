@@ -129,4 +129,13 @@
         delete from jade.claims_and_debt where CAD_id = #{cadId}
     </delete>
 
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="cadId" useGeneratedKeys="true">
+        insert into jade.claims_and_debt(CAD_type, creditor, obligor, CAD_num, CAD_time, CAD_repay, CAD_plan, CAD_remark, CAD_status)
+        values (#{cadType}, #{creditor}, #{obligor}, #{cadNum}, #{cadTime}, #{cadRepay}, #{cadPlan}, #{cadRemark}, #{cadStatus})
+    </insert>
+
+
+
 </mapper>

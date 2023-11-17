@@ -53,31 +53,47 @@ public class UserExpensesController {
      *
      * @param offset 查询起始位置
      * @param limit 查询条数
-     * @param  userExpenses
      * @return 对象列表
      */
     @GetMapping("selectAll")
     public ResponseEntity<Map<String,Object>> selectAll(
-            @RequestParam(value = "offset" ,required = false) Integer offset,
-            Integer limit , UserExpenses userExpenses){
-        Map<String,Object> map = new HashMap<>();
-        if (offset == null || offset == 0){
+            @RequestParam(value = "offset", required = false) Integer offset, @RequestParam(value = "startTime", required = false) String startTime,
+            @RequestParam(value = "endTime", required = false) String endTime,
+            Integer limit, UserExpenses userExpenses) {
+        System.out.println("UserExpenses userExpenses: " + userExpenses);
+        Map<String, Object> map = new HashMap<>();
+        if (offset == null || offset == 0) {
             userExpenses.setOffset(1);
-        }else{
+        } else {
             userExpenses.setOffset(offset);
         }
-
-        if (StringUtils.isNotBlank(userExpenses.getExpensesTime()) && !",".equals(userExpenses.getExpensesTime())){
+        if (StringUtils.isNotBlank(userExpenses.getExpensesTime()) && !",".equals(userExpenses.getExpensesTime())) {
             String[] split = StringUtils.split(userExpenses.getExpensesTime(), ',');
-            userExpenses.setDate1(split[0].replaceAll("-",""));
-            userExpenses.setDate2(split[1].replaceAll("-",""));
-        }else {
+            userExpenses.setDate1(split[0].replaceAll("-", ""));
+            System.out.println(split[0].replaceAll("-", ""));
+            userExpenses.setDate2(split[1].replaceAll("-", ""));
+            System.out.println(split[1].replaceAll("-", ""));
+        } else {
             userExpenses.setExpensesTime(null);
         }
-        userExpenses.setLimit(limit);
+        if (StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
+            userExpenses.setDate1(startTime.replaceAll("-", ""));
+            System.out.println(startTime.replaceAll("-", ""));
+            userExpenses.setDate2(endTime.replaceAll("-", ""));
+            System.out.println(endTime.replaceAll("-", ""));
+            userExpenses.setExpensesTime(startTime.replaceAll("-", "") + ',' + endTime.replaceAll("-", ""));
+        }
+        if (limit == null) {
+            userExpenses.setLimit(1000);
+        } else {
+            userExpenses.setLimit(limit);
+        }
+        if (userExpenses.getExpensesSort() != null && userExpenses.getExpensesSort().equals("all")) {
+            userExpenses.setExpensesTime(null);
+        }
         PageInfo<UserExpenses> allData = userExpensesService.queryAllByEntity(userExpenses);
-        map.put("count",allData.getTotal());
-        map.put("data",allData.getList());
+        map.put("count", allData.getTotal());
+        map.put("data", allData.getList());
         return ResponseEntity.ok(map);
     }
 
@@ -94,11 +110,11 @@ public class UserExpensesController {
     /**
      * 新增数据
      *
-     * @param  userExpenses
+     * @param  userExpenses 实例对象
      * @return Void
      */
-    @PostMapping("insert")
-    public ResponseEntity<Void> insert(@RequestBody UserExpenses userExpenses){
+    @GetMapping("insertExpenses")
+    public ResponseEntity<Void> insert(UserExpenses userExpenses){
         userExpenses.setExpensesTime(TimeUtils.getCurrentDateString("YYYYMMdd"));
         //Integer userId = userClient.findId(userExpenses.getExpensesUser()).getUserId();
         userExpenses.setExpensesUserId(String.valueOf(1));
@@ -110,12 +126,12 @@ public class UserExpensesController {
     /**
      * 通过主键删除数据
      *
-     * @param id 主键
+     * @param expensesId 主键
      * @return 是否成功
      */
-    @GetMapping("delete")
-    public ResponseEntity<Boolean> delete(Integer id){
-        boolean b = userExpensesService.deleteById(id);
+    @GetMapping("deleteExpenses")
+    public ResponseEntity<Boolean> delete(Integer expensesId){
+        boolean b = userExpensesService.deleteById(expensesId);
         return ResponseEntity.ok(b);
     }
 
@@ -126,7 +142,7 @@ public class UserExpensesController {
      * @param userExpenses
      * @return Void
      */
-    @PostMapping("update")
+    @PostMapping("updateExpenses")
     public ResponseEntity<Void> update(@RequestBody UserExpenses userExpenses){
         if (userExpenses.getExpensesId() == null || userExpenses.getExpensesId() == 0){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -165,18 +181,14 @@ public class UserExpensesController {
      * ExpensesTime设置为当前日期，date1设置为本月、年，根据传入参数不同进行区分
      */
     @GetMapping("getExpensesCollection")
-    public ResponseEntity<Map<String,Object>> getExpensesCollection(String flag){
-        if (StringUtils.isNotBlank(flag)){
+    public ResponseEntity<Map<String,Object>> getExpensesCollection(String date){
+        if (StringUtils.isNotBlank(date)) {
             UserExpenses userExpenses = new UserExpenses();
-            if ("month".equals(flag)){
-                userExpenses.setDate1(TimeUtils.getCurrentDateString("YYYYMM"));
-            }else {
-                userExpenses.setDate1(TimeUtils.getCurrentDateString("YYYY"));
-            }
+            userExpenses.setDate1(TimeUtils.getCurrentDateString(date));
             userExpenses.setExpensesTime(TimeUtils.getCurrentDateString("YYYYMMdd"));
-            Map<String,Object> expenses = userExpensesService.getMonthExpenses(userExpenses);
+            Map<String, Object> expenses = userExpensesService.getMonthExpenses(userExpenses);
             return ResponseEntity.ok(expenses);
-        }else {
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }

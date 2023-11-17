@@ -59,7 +59,9 @@ public class UserStockController {
         }else{
             userStockFillter.setOffset(offset);
         }
-        userStockFillter.setLimit(limit);
+        if (limit == null || limit ==0){
+            userStockFillter.setLimit(1000);
+        }
         PageInfo<UserStock> allData = userStockService.queryAllByEntity(userStockFillter);
         map.put("count",allData.getTotal());
         map.put("data",allData.getList());
@@ -74,8 +76,8 @@ public class UserStockController {
      * @param  userStock
      * @return Void
      */
-    @PostMapping("insert")
-    public ResponseEntity<Void> insert(@RequestBody UserStock userStock){
+    @GetMapping("insert")
+    public ResponseEntity<Void> insert(UserStock userStock){
         userStockService.insert(userStock);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -84,12 +86,12 @@ public class UserStockController {
     /**
      * 通过主键删除数据
      *
-     * @param id 主键
+     * @param stockId 主键
      * @return 是否成功
      */
     @GetMapping("delete")
-    public ResponseEntity<Boolean> delete(Integer id){
-        boolean b = userStockService.deleteById(id);
+    public ResponseEntity<Boolean> delete(Integer stockId){
+        boolean b = userStockService.deleteById(stockId);
         return ResponseEntity.ok(b);
     }
 
@@ -100,7 +102,7 @@ public class UserStockController {
      * @param userStock
      * @return Void
      */
-    @PutMapping("update")
+    @PostMapping("update")
     public ResponseEntity<Void> update(@RequestBody UserStock userStock){
         userStockService.update(userStock);
         return ResponseEntity.status(HttpStatus.CREATED).build();

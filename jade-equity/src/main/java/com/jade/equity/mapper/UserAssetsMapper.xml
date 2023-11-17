@@ -42,8 +42,9 @@
                 and assets_location = #{assetsLocation}
             </if>
             <if test="assetsCreateTime != null and assetsCreateTime != ''">
-                and assets_create_time = #{assetsCreateTime}
+                and assets_create_time between #{date1} and #{date2}
             </if>
+
             <if test="totalPrice != null and totalPrice != ''">
                 and total_price = #{totalPrice}
             </if>

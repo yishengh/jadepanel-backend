@@ -66,7 +66,15 @@ public interface UserInfoMapper {
      */
     int deleteById(Integer userId);
 
-    UserInfo selectOne(String username);
+
+    /**
+     * 查询数据
+     *
+     * @param userName 实例对象
+     * @param password 实例对象
+     * @return 实例对象
+     */
+    UserInfo selectOne(String userName, String password);
 
     UserInfo queryId(UserInfo userInfo);
 }

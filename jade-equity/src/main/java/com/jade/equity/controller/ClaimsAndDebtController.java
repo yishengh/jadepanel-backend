@@ -1,5 +1,6 @@
 package com.jade.equity.controller;
 
+import com.jade.common.utils.TimeUtils;
 import com.jade.equity.entity.ClaimsAndDebt;
 import com.jade.equity.service.ClaimsAndDebtService;
 import com.github.pagehelper.PageInfo;
@@ -49,13 +50,18 @@ public class ClaimsAndDebtController {
      * @return 对象列表
      */
     @GetMapping("selectAll")
-    public ResponseEntity<Map<String,Object>> selectAll(Integer offset ,Integer limit , ClaimsAndDebt claimsAndDebt){
+    public ResponseEntity<Map<String,Object>> selectAll(
+            Integer offset ,
+            @RequestParam(value = "startTime", required = false) String startTime,
+            @RequestParam(value = "endTime", required = false) String endTime,
+            Integer limit , ClaimsAndDebt claimsAndDebt){
         Map<String,Object> map = new HashMap<>();
         if (offset == null || offset == 0){
             claimsAndDebt.setOffset(1);
         }else{
             claimsAndDebt.setOffset(offset);
         }
+
 
         if (StringUtils.isNotBlank(claimsAndDebt.getCadTime()) && !",".equals(claimsAndDebt.getCadTime())){
             String[] split = StringUtils.split(claimsAndDebt.getCadTime(), ',');
@@ -64,7 +70,22 @@ public class ClaimsAndDebtController {
         }else {
             claimsAndDebt.setCadTime(null);
         }
-        claimsAndDebt.setLimit(limit);
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(startTime) && org.apache.commons.lang3.StringUtils.isNotBlank(endTime)) {
+            claimsAndDebt.setDate1(startTime.replaceAll("-", ""));
+            claimsAndDebt.setDate2(endTime.replaceAll("-", ""));
+            claimsAndDebt.setCadTime(startTime.replaceAll("-", "") + ',' + endTime.replaceAll("-", ""));
+        }
+
+
+
+        if (limit == null) {
+            claimsAndDebt.setLimit(1000);
+        } else {
+            claimsAndDebt.setLimit(limit);
+        }
+        if (claimsAndDebt.getCadType() != null && claimsAndDebt.getCadType().equals("all")) {
+            claimsAndDebt.setCadType(null);
+        }
         PageInfo<ClaimsAndDebt> allData = claimsAndDebtService.queryAllByEntity(claimsAndDebt);
         map.put("count",allData.getTotal());
         map.put("data",allData.getList());
@@ -79,8 +100,10 @@ public class ClaimsAndDebtController {
      * @param  claimsAndDebt
      * @return Void
      */
-    @PostMapping("insert")
-    public ResponseEntity<Void> insert(@RequestBody ClaimsAndDebt claimsAndDebt){
+    @GetMapping("insertClaimsAndDebt")
+    public ResponseEntity<Void> insert(ClaimsAndDebt claimsAndDebt){
+        claimsAndDebt.setCadTime(TimeUtils.getCurrentDateString("YYYYMMdd"));
+        // setID
         claimsAndDebtService.insert(claimsAndDebt);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -89,12 +112,12 @@ public class ClaimsAndDebtController {
     /**
      * 通过主键删除数据
      *
-     * @param id 主键
+     * @param cadId 主键
      * @return 是否成功
      */
-    @GetMapping("delete")
-    public ResponseEntity<Boolean> delete(Integer id){
-        boolean b = claimsAndDebtService.deleteById(id);
+    @GetMapping("deleteClaimsAndDebt")
+    public ResponseEntity<Boolean> delete(Integer cadId){
+        boolean b = claimsAndDebtService.deleteById(cadId);
         return ResponseEntity.ok(b);
     }
 
@@ -105,18 +128,13 @@ public class ClaimsAndDebtController {
      * @param claimsAndDebt
      * @return Void
      */
-    @PutMapping("update")
+    @PostMapping("updateClaimsAndDebt")
     public ResponseEntity<Void> update(@RequestBody ClaimsAndDebt claimsAndDebt){
+        if (claimsAndDebt.getCadId() == null || claimsAndDebt.getCadId() == 0){
+            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
         claimsAndDebtService.update(claimsAndDebt);
         return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
-
-    @GetMapping("getClaimsAndDebtsCollection")
-    public ResponseEntity<Map<String,Object>> getClaimsAndDebtsCollection() {
-        ClaimsAndDebt claimsAndDebt = new ClaimsAndDebt();
-        Map<String, Object> assets = this.claimsAndDebtService.getCADCollection(claimsAndDebt);
-        return ResponseEntity.ok(assets);
     }
 
 
@@ -127,7 +145,7 @@ public class ClaimsAndDebtController {
      * @return Void
      */
     @GetMapping("downloadClaimsAndDebts")
-    public ResponseEntity<Void> downloadIncome(ClaimsAndDebt claimsAndDebts) throws IOException, WriteException {
+    public ResponseEntity<Void> downloadClaimsAndDebts(ClaimsAndDebt claimsAndDebts) throws IOException, WriteException {
 //        //todo
 //        if (StringUtils.isNotBlank(userIncome.getIncomeTime()) && !",".equals(userIncome.getIncomeTime()) ){
 //            String[] split = StringUtils.split(userIncome.getIncomeTime(), ',');
@@ -140,4 +158,23 @@ public class ClaimsAndDebtController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+
+    /**
+     * @Description: 本月收入集合
+     * @Param: flag 年、月区分
+     * @return: Map<String, Object>
+     * incomeTime设置为当前日期，date1设置为本月、年，根据传入参数不同进行区分
+     */
+    @GetMapping("getClaimsAndDebtsCollection")
+    public ResponseEntity<Map<String, Object>> getClaimsAndDebtsCollection(String date) {
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(date)) {
+            ClaimsAndDebt userClaimsAndDebt = new ClaimsAndDebt();
+            userClaimsAndDebt.setDate1(TimeUtils.getCurrentDateString(date));
+            userClaimsAndDebt.setCadTime(TimeUtils.getCurrentDateString("YYYYMMdd"));
+            Map<String, Object> cad = claimsAndDebtService.getCADCollection(userClaimsAndDebt);
+            return ResponseEntity.ok(cad);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
 }

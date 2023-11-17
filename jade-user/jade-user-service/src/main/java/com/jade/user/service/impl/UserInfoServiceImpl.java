@@ -83,8 +83,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public UserInfo queryUser(String username, String password) {
-        UserInfo userInfo = userInfoMapper.selectOne(username);
-        return null;
+    public UserInfo queryUser(UserInfo userInfo) {
+        System.out.println("queryUser");
+        return userInfoMapper.selectOne(userInfo.getUserName(), userInfo.getPassword());
     }
 }

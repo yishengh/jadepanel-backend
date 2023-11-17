@@ -1,9 +1,11 @@
 package com.jade.equity.controller;
 
+import com.jade.common.utils.TimeUtils;
 import com.jade.equity.entity.UserAssets;
 import com.jade.equity.service.UserAssetsService;
 import com.github.pagehelper.PageInfo;
 import jxl.write.WriteException;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,15 +51,42 @@ public class UserAssetsController {
      */
     @GetMapping("selectAll")
     public ResponseEntity<Map<String,Object>> selectAll(
-            @RequestParam(value = "offset" ,required = false)
-                    Integer offset,Integer limit , UserAssets userAssets){
+                    Integer offset,
+            @RequestParam(value = "startTime", required = false) String startTime,
+            @RequestParam(value = "endTime", required = false) String endTime,
+            Integer limit , UserAssets userAssets){
         Map<String,Object> map = new HashMap<>();
         if (offset == null || offset == 0){
             userAssets.setOffset(1);
         }else{
             userAssets.setOffset(offset);
         }
-        userAssets.setLimit(limit);
+
+
+
+        if (StringUtils.isNotBlank(userAssets.getAssetsCreateTime()) && !",".equals(userAssets.getAssetsCreateTime())){
+            String[] split = StringUtils.split(userAssets.getAssetsCreateTime(), ',');
+            userAssets.setDate1(split[0].replaceAll("-",""));
+            userAssets.setDate2(split[1].replaceAll("-",""));
+        }else {
+            userAssets.setAssetsCreateTime(null);
+        }
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(startTime) && org.apache.commons.lang3.StringUtils.isNotBlank(endTime)) {
+            userAssets.setDate1(startTime.replaceAll("-", ""));
+            userAssets.setDate2(endTime.replaceAll("-", ""));
+            userAssets.setAssetsCreateTime(startTime.replaceAll("-", "") + ',' + endTime.replaceAll("-", ""));
+        }
+
+
+
+
+
+        if (limit == null || limit == 0){
+            userAssets.setLimit(1000);
+        }
+        else {
+            userAssets.setLimit(limit);
+        }
         PageInfo<UserAssets> allData = userAssetsService.queryAllByEntity(userAssets);
         map.put("count",allData.getTotal());
         map.put("data",allData.getList());
@@ -73,8 +102,9 @@ public class UserAssetsController {
      * @param  userAssets
      * @return Void
      */
-    @PostMapping("insert")
-    public ResponseEntity<Void> insert(@RequestBody UserAssets userAssets){
+    @GetMapping("insertAssets")
+    public ResponseEntity<Void> insert(UserAssets userAssets){
+        userAssets.setAssetsCreateTime(TimeUtils.getCurrentDateString("YYYYMMdd"));
         userAssetsService.insert(userAssets);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -83,12 +113,12 @@ public class UserAssetsController {
     /**
      * 通过主键删除数据
      *
-     * @param id 主键
+     * @param assetsId 主键
      * @return 是否成功
      */
-    @GetMapping("delete")
-    public ResponseEntity<Boolean> delete(Integer id){
-        boolean b = userAssetsService.deleteById(id);
+    @GetMapping("deleteAssets")
+    public ResponseEntity<Boolean> delete(Integer assetsId){
+        boolean b = userAssetsService.deleteById(assetsId);
         return ResponseEntity.ok(b);
     }
 
@@ -99,8 +129,11 @@ public class UserAssetsController {
      * @param userAssets
      * @return Void
      */
-    @PutMapping("update")
+    @PostMapping("updateAssets")
     public ResponseEntity<Void> update(@RequestBody UserAssets userAssets){
+        if (userAssets.getAssetsId() == null || userAssets.getAssetsId() == 0) {
+            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
         userAssetsService.update(userAssets);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

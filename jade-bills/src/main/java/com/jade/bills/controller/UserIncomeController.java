@@ -69,17 +69,13 @@ public class UserIncomeController {
         if (StringUtils.isNotBlank(userIncome.getIncomeTime()) && !",".equals(userIncome.getIncomeTime())) {
             String[] split = StringUtils.split(userIncome.getIncomeTime(), ',');
             userIncome.setDate1(split[0].replaceAll("-", ""));
-            System.out.println(split[0].replaceAll("-", ""));
             userIncome.setDate2(split[1].replaceAll("-", ""));
-            System.out.println(split[1].replaceAll("-", ""));
         } else {
             userIncome.setIncomeTime(null);
         }
         if (StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
             userIncome.setDate1(startTime.replaceAll("-", ""));
-            System.out.println(startTime.replaceAll("-", ""));
             userIncome.setDate2(endTime.replaceAll("-", ""));
-            System.out.println(endTime.replaceAll("-", ""));
             userIncome.setIncomeTime(startTime.replaceAll("-", "") + ',' + endTime.replaceAll("-", ""));
         }
         if (limit == null) {

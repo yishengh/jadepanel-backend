@@ -65,6 +65,9 @@ public class UserStockServiceImpl implements UserStockService {
      */
     @Override
     public UserStock insert(UserStock userStock) {
+        if (userStock.getStockUserId() == null){
+            userStock.setStockId(1);
+        }
         this.userStockMapper.insert(userStock);
         return userStock;
     }
